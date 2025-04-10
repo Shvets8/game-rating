@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мои оценки игр</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .game-form, .game-list {
+      max-width: 800px;
+      margin: 0 auto 40px auto;
+      background-color: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    }
+    input, select, textarea {
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .game-entry {
+      background-color: #2a2a2a;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    .game-entry h3 {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 Мои оценки после прохождения игр</h1>
+  <div class="game-form">
+    <input type="text" id="gameTitle" placeholder="Название игры" required>
+    <input type="date" id="gameDate" required>
+    <input type="text" id="gamePlatform" placeholder="Платформа (PC, PS5 и т.д.)">
+    <input type="text" id="gameTime" placeholder="Время в игре (часы)">
+    <input type="text" id="gameStreamed" placeholder="Пройдено на стриме? (Да/Нет)">
+
+    <h3>Оценки (0–10):</h3>
+    <input type="number" id="scoreStory" placeholder="Сюжет / Нарратив">
+    <input type="number" id="scoreActing" placeholder="Актёрская игра / Озвучка">
+    <input type="number" id="scoreSound" placeholder="Звук и музыка">
+    <input type="number" id="scoreGraphics" placeholder="Графика и арт">
+    <input type="number" id="scoreAnimation" placeholder="Анимации и мимика">
+    <input type="number" id="scoreGameplay" placeholder="Геймплей / Управление">
+    <input type="number" id="scoreWorld" placeholder="Проработка мира / лор">
+    <input type="number" id="scoreDirecting" placeholder="Режиссура / катсцены">
+    <input type="number" id="scoreBugs" placeholder="Оптимизация и баги">
+    <input type="number" id="scoreOriginality" placeholder="Оригинальность и впечатление">
+
+    <textarea id="gameComment" placeholder="Комментарий / мнение" rows="5"></textarea>
+    <button onclick="addGame()">Добавить игру</button>
+  </div>
+
+  <div class="game-list" id="gameList">
+    <h2>🗂 Пройденные игры</h2>
+  </div>
+
+  <script>
+    function addGame() {
+      const getVal = id => document.getElementById(id).value.trim();
+      const scores = ["scoreStory", "scoreActing", "scoreSound", "scoreGraphics", "scoreAnimation", "scoreGameplay", "scoreWorld", "scoreDirecting", "scoreBugs", "scoreOriginality"].map(id => parseFloat(getVal(id)) || 0);
+      const avg = (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
+
+      const container = document.getElementById("gameList");
+      const entry = document.createElement("div");
+      entry.className = "game-entry";
+      entry.innerHTML = `
+        <h3>${getVal("gameTitle")} (${getVal("gameDate")})</h3>
+        <p><strong>Платформа:</strong> ${getVal("gamePlatform")} | <strong>Время:</strong> ${getVal("gameTime")} ч | <strong>Стрим:</strong> ${getVal("gameStreamed")} | <strong>Средняя оценка:</strong> ${avg}/10</p>
+        <details>
+          <summary>Показать оценки</summary>
+          <ul>
+            <li>Сюжет: ${scores[0]}</li>
+            <li>Актёрская игра: ${scores[1]}</li>
+            <li>Звук: ${scores[2]}</li>
+            <li>Графика: ${scores[3]}</li>
+            <li>Анимации: ${scores[4]}</li>
+            <li>Геймплей: ${scores[5]}</li>
+            <li>Мир и лор: ${scores[6]}</li>
+            <li>Режиссура: ${scores[7]}</li>
+            <li>Оптимизация: ${scores[8]}</li>
+            <li>Оригинальность: ${scores[9]}</li>
+          </ul>
+        </details>
+        <p><em>${getVal("gameComment")}</em></p>
+      `;
+      container.appendChild(entry);
+
+      document.querySelector(".game-form").reset();
+    }
+  </script>
+</body>
+</html>
