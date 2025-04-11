@@ -17,7 +17,7 @@
   function renderGames(games) {
     const container = document.getElementById("gameList");
     container.innerHTML = "<h2>🗂 Пройденные игры</h2>";
-    games.forEach(game => {
+    games.forEach((game, index) => {
       const entry = document.createElement("div");
       entry.className = "game-entry";
       entry.innerHTML = `
@@ -39,17 +39,24 @@
           </ul>
         </details>
         <p><em>${game.comment}</em></p>
+        <button onclick="deleteGame(${index})">❌ Удалить</button>
+        <button onclick="editGame(${index})">✏️ Редактировать</button>
+        <hr>
       `;
       container.appendChild(entry);
     });
   }
 
-  function addGame() {
-    const scores = ["scoreStory", "scoreActing", "scoreSound", "scoreGraphics", "scoreAnimation", "scoreGameplay", "scoreWorld", "scoreDirecting", "scoreBugs", "scoreOriginality"]
-      .map(id => parseFloat(getVal(id)) || 0);
+  function getFormData() {
+    const scores = [
+      "scoreStory", "scoreActing", "scoreSound", "scoreGraphics",
+      "scoreAnimation", "scoreGameplay", "scoreWorld",
+      "scoreDirecting", "scoreBugs", "scoreOriginality"
+    ].map(id => parseFloat(getVal(id)) || 0);
+
     const avg = (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
 
-    const newGame = {
+    return {
       title: getVal("gameTitle"),
       date: getVal("gameDate"),
       platform: getVal("gamePlatform"),
@@ -59,15 +66,60 @@
       avg: avg,
       comment: getVal("gameComment")
     };
+  }
 
+  function fillForm(data) {
+    document.getElementById("gameTitle").value = data.title;
+    document.getElementById("gameDate").value = data.date;
+    document.getElementById("gamePlatform").value = data.platform;
+    document.getElementById("gameTime").value = data.time;
+    document.getElementById("gameStreamed").value = data.streamed;
+    document.getElementById("gameComment").value = data.comment;
+
+    const scoreIds = [
+      "scoreStory", "scoreActing", "scoreSound", "scoreGraphics",
+      "scoreAnimation", "scoreGameplay", "scoreWorld",
+      "scoreDirecting", "scoreBugs", "scoreOriginality"
+    ];
+
+    scoreIds.forEach((id, i) => {
+      document.getElementById(id).value = data.scores[i];
+    });
+  }
+
+  let editIndex = -1;
+
+  function addGame() {
     const allGames = loadFromStorage();
-    allGames.push(newGame);
+    const newGame = getFormData();
+
+    if (editIndex >= 0) {
+      allGames[editIndex] = newGame;
+      editIndex = -1;
+    } else {
+      allGames.push(newGame);
+    }
+
     saveToStorage(allGames);
     renderGames(allGames);
     document.querySelector(".game-form").reset();
   }
 
-  // Загружаем при старте
+  function deleteGame(index) {
+    const allGames = loadFromStorage();
+    allGames.splice(index, 1);
+    saveToStorage(allGames);
+    renderGames(allGames);
+  }
+
+  function editGame(index) {
+    const allGames = loadFromStorage();
+    const game = allGames[index];
+    fillForm(game);
+    editIndex = index;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   window.onload = () => {
     const stored = loadFromStorage();
     renderGames(stored);
